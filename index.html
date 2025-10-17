@@ -18,18 +18,10 @@
         <ul>
           <li>
             <a
-              href="https://docs.google.com/spreadsheets/d/13PJ_zY3UQYYJ1OsDfxyrc74Dvfl4_YDB/edit?gid=956659845#gid=956659845"
+              href="https://www.notion.so/WPH-REP-Modules-27d12ce77e1b80edbe12e5653659576b"
               target="_blank"
               rel="noopener noreferrer"
-              >WPH Classes</a
-            >
-          </li>
-          <li>
-            <a
-              href="https://roadmap.sh/u/triajidev"
-              target="_blank"
-              rel="noopener noreferrer"
-              >Roadmap.sh</a
+              >WPH Modules</a
             >
           </li>
           <li>
@@ -46,14 +38,6 @@
               target="_blank"
               rel="noopener noreferrer"
               >LeetCode</a
-            >
-          </li>
-          <li>
-            <a
-              href="https://app.speechace.co/placement/"
-              target="_blank"
-              rel="noopener noreferrer"
-              >SpeechAce</a
             >
           </li>
         </ul>
@@ -86,14 +70,6 @@
               >LinkedIn</a
             >
           </li>
-          <li>
-            <a
-              href="https://app.daily.dev/ajiprabandaru"
-              target="_blank"
-              rel="noopener noreferrer"
-              >Daily.dev</a
-            >
-          </li>
         </ul>
       </section>
 
@@ -121,21 +97,20 @@
 
       <section id="todo">
         <h2>To Do</h2>
-        <ul>
-          <li>
-            <input type="checkbox" checked /> Create simple Dashboard Oct 2025
-          </li>
+        <div class="todo-input-container">
+          <input type="text" id="newTodoInput" placeholder="Add new task..." />
+          <button id="addTodoBtn">Add Task</button>
+        </div>
+        <ul id="todoList">
           <li>
             <input type="checkbox" /> Create simple CV web for frontend web
             developer
+            <button class="remove-btn" onclick="removeTask(this)">×</button>
           </li>
-          <li><input type="checkbox" /> Create simple CV web for architect</li>
           <li>
-            <input type="checkbox" checked /> Improve LinkedIn as frontend web
-            developer
+            <input type="checkbox" /> Create simple CV web for architect
+            <button class="remove-btn" onclick="removeTask(this)">×</button>
           </li>
-          <li><input type="checkbox" /> Improve skills in Roadmap.sh</li>
-          <li><input type="checkbox" checked /> Adjust profile in GitHub</li>
         </ul>
       </section>
     </div>
@@ -176,6 +151,108 @@
           darkModeToggle.textContent = 'Dark Mode';
         }
       });
+
+      // To-Do List Functionality
+      const todoList = document.getElementById('todoList');
+      const newTodoInput = document.getElementById('newTodoInput');
+      const addTodoBtn = document.getElementById('addTodoBtn');
+      const TODO_STORAGE_KEY = 'todoList_v2';
+
+      let todos = [];
+
+      // Load saved todos
+      function loadTodos() {
+        const savedTodos = localStorage.getItem(TODO_STORAGE_KEY);
+        if (savedTodos) {
+          todos = JSON.parse(savedTodos);
+        } else {
+          // Default todos if none saved
+          todos = [
+            { text: 'Create simple Dashboard Oct 2025', completed: true },
+            {
+              text: 'Create simple CV web for frontend web developer',
+              completed: false,
+            },
+            { text: 'Create simple CV web for architect', completed: false },
+            {
+              text: 'Improve LinkedIn as frontend web developer',
+              completed: true,
+            },
+            { text: 'Improve skills in Roadmap.sh', completed: false },
+            { text: 'Adjust profile in GitHub', completed: true },
+          ];
+        }
+        renderTodos();
+      }
+
+      // Save todos to localStorage
+      function saveTodos() {
+        localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos));
+      }
+
+      // Render todos to DOM
+      function renderTodos() {
+        todoList.innerHTML = '';
+        todos.forEach((todo, index) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <input type="checkbox" ${
+              todo.completed ? 'checked' : ''
+            } onchange="toggleTodo(${index})">
+            <span class="task-text">${todo.text}</span>
+            <button class="remove-btn" onclick="removeTask(${index})">×</button>
+          `;
+
+          if (todo.completed) {
+            li.style.textDecoration = 'line-through';
+            li.style.opacity = '0.6';
+            li.style.color = '#718096';
+          }
+
+          todoList.appendChild(li);
+        });
+      }
+
+      // Add new todo
+      function addTodo() {
+        const text = newTodoInput.value.trim();
+        if (text) {
+          todos.push({ text, completed: false });
+          newTodoInput.value = '';
+          saveTodos();
+          renderTodos();
+        }
+      }
+
+      // Toggle todo completion
+      function toggleTodo(index) {
+        todos[index].completed = !todos[index].completed;
+        saveTodos();
+        renderTodos();
+      }
+
+      // Remove todo
+      function removeTask(index) {
+        todos.splice(index, 1);
+        saveTodos();
+        renderTodos();
+      }
+
+      // Event listeners
+      addTodoBtn.addEventListener('click', addTodo);
+
+      newTodoInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+          addTodo();
+        }
+      });
+
+      // Make functions global for onclick handlers
+      window.toggleTodo = toggleTodo;
+      window.removeTask = removeTask;
+
+      // Load todos on page load
+      loadTodos();
     </script>
   </body>
 </html>
